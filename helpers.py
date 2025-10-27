@@ -202,6 +202,26 @@ def generate_server_logs():
 
     return server_log_data
 
+def connect_redis_cloud():
+
+    r = redis.Redis(
+        host= st.secrets['cl_redis_host'],
+        port= 16478,
+        decode_responses=True,
+        username=st.secrets['cl_redis_user'],
+        password=st.secrets['cl_redis_password']
+    )
+
+    # success = r.set('foo', 'bar')
+    # True
+
+    # result = r.get('foo')
+    # print(result)
+    # >>> bar
+    return r
+
+
+redis_server = connect_redis_cloud()
 
 def consume_from_redis_q(stream):
     """
@@ -210,7 +230,7 @@ def consume_from_redis_q(stream):
     :return:
     """
     # redis_server = redis.Redis(host=os.getenv('redis_host'), port=6379, db=0)
-    redis_server = redis.Redis(host=st.secrets['redis_host'], port=6379, db=0)
+    # redis_server = redis.Redis(host=st.secrets['redis_host'], port=6379, db=0)
     stream_key = stream
     last_id = '0-0'
 
@@ -219,10 +239,10 @@ def consume_from_redis_q(stream):
     message_id = []
 
     for stream_id, fields in redis_messages[0][1]:
-        entry_data = {"message_id": stream_id.decode('utf-8')}
-        message_id.append(stream_id.decode('utf-8'))
+        entry_data = {"message_id": stream_id}
+        message_id.append(stream_id)
         for key, value in fields.items():
-            entry_data[key.decode('utf-8')] = value.decode('utf-8')
+            entry_data[key] = value
         processed_streams.append(entry_data)
 
 

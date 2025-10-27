@@ -7,16 +7,18 @@ import plotly.graph_objects as go
 from helpers import run_pd_sql, get_news_article
 
 # SQL Statements
-date_today = '2025-10-25'
+# date_today = '2025-10-25'
+date_today = datetime.now().strftime("%Y-%m-%d")
+
 st_autorefresh(interval=3600000, key="data_refresh")
 
 news_source, news_author, news_title, news_description, news_url = get_news_article()
 
-sql_all_critical_events_cnt_today = ("select count(1) from regex_classified rc "
-                                 "where CAST(rc.workflow_timestamp as DATE) = '2025-10-25' "
-                                 "and regex_label in ('Workflow Error', 'Security Alert', 'Critical Error')")
+sql_all_critical_events_cnt_today = (f"select count(1) from regex_classified rc "
+                                 f"where CAST(rc.workflow_timestamp as DATE) = '{date_today}' "
+                                 f"and regex_label in ('Workflow Error', 'Security Alert', 'Critical Error')")
 
-sql_all_events_today = "select count(1) from regex_classified rc where CAST(rc.workflow_timestamp as DATE) = '2025-10-25'"
+sql_all_events_today = f"select count(1) from regex_classified rc where CAST(rc.workflow_timestamp as DATE) = '{date_today}'"
 
 sql_count_grp_per_event_type = (f"with union_select as (select * from regex_classified rc union all "
              f"select * from bert_classified bc) select regex_label, count(1) as number_of_events "
@@ -24,8 +26,8 @@ sql_count_grp_per_event_type = (f"with union_select as (select * from regex_clas
              f"having TO_DATE(us.workflow_timestamp, 'YYYY-MM-DD') = '{date_today}' ")
 
 
-sql_security_alert = ("select count(1) from regex_classified rc where CAST(rc.workflow_timestamp as DATE) = '2025-10-25'"
-                      "and rc.regex_label = 'Security Alert'")
+sql_security_alert = (f"select count(1) from regex_classified rc where CAST(rc.workflow_timestamp as DATE) = '{date_today}'"
+                      f"and rc.regex_label = 'Security Alert'")
 
 sql_suspicious_user_actions = (f" with union_select as (select * from regex_classified rc union all "
                                f"select * from bert_classified bc) select count(1) as UserActions "

@@ -203,22 +203,28 @@ def generate_server_logs():
     return server_log_data
 
 def connect_redis_cloud():
+    redis_url = st.secrets['cl_redis_url']
+    try:
+        r = redis.from_url(redis_url)
+        return r
+        # r = redis.Redis(
+        #     host= st.secrets['cl_redis_host'],
+        #     port= 16478,
+        #     decode_responses=True,
+        #     username=st.secrets['cl_redis_user'],
+        #     password=st.secrets['cl_redis_password']
+        # )
+    except redis.exceptions.ConnectionError as e:
+        st.error(f"Could not connect to Redis Cloud: {e}")
+    except Exception as e:
+        st.error(f"An unexpected error occurred: {e}")
+        # success = r.set('foo', 'bar')
+        # True
 
-    r = redis.Redis(
-        host= st.secrets['cl_redis_host'],
-        port= 16478,
-        decode_responses=True,
-        username=st.secrets['cl_redis_user'],
-        password=st.secrets['cl_redis_password']
-    )
+        # result = r.get('foo')
+        # print(result)
+        # >>> bar
 
-    # success = r.set('foo', 'bar')
-    # True
-
-    # result = r.get('foo')
-    # print(result)
-    # >>> bar
-    return r
 
 
 redis_server = connect_redis_cloud()

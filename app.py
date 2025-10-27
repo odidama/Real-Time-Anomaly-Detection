@@ -4,7 +4,7 @@ from streamlit_extras.stylable_container import stylable_container
 from streamlit_autorefresh import st_autorefresh
 import plotly.express as px
 import plotly.graph_objects as go
-from helpers import run_pd_sql, get_news_article
+import helpers
 
 # SQL Statements
 # date_today = '2025-10-25'
@@ -12,7 +12,7 @@ date_today = datetime.now().strftime("%Y-%m-%d")
 
 st_autorefresh(interval=3600000, key="data_refresh")
 
-news_source, news_author, news_title, news_description, news_url = get_news_article()
+news_source, news_author, news_title, news_description, news_url = helpers.get_news_article()
 
 sql_all_critical_events_cnt_today = (f"select count(1) from regex_classified rc "
                                  f"where CAST(rc.workflow_timestamp as DATE) = '{date_today}' "
@@ -46,12 +46,12 @@ sql_src_msg_trgt = (f"with union_select as (select * from regex_classified rc un
                     f"union_select us where TO_DATE(us.workflow_timestamp, 'YYYY-MM-DD') = '{date_today}' "
                     f"order by TO_DATE(us.workflow_timestamp, 'YYYY-MM-DD') desc limit 9")
 
-critical_events_count_today = run_pd_sql(sql_all_critical_events_cnt_today).iloc[0, 0].item()
-all_events_today = run_pd_sql(sql_all_events_today).iloc[0, 0].item()
-sql_count_grp_per_event_type = run_pd_sql(sql_count_grp_per_event_type)
-sql_suspicious_user_actions = run_pd_sql(sql_suspicious_user_actions).iloc[0, 0].item()
-source_systems = run_pd_sql(sql_source_system)
-src_msg_trgt = run_pd_sql(sql_src_msg_trgt)
+critical_events_count_today = helpers.run_pd_sql(sql_all_critical_events_cnt_today).iloc[0, 0].item()
+all_events_today = helpers.run_pd_sql(sql_all_events_today).iloc[0, 0].item()
+sql_count_grp_per_event_type = helpers.run_pd_sql(sql_count_grp_per_event_type)
+sql_suspicious_user_actions = helpers.run_pd_sql(sql_suspicious_user_actions).iloc[0, 0].item()
+source_systems = helpers.run_pd_sql(sql_source_system)
+src_msg_trgt = helpers.run_pd_sql(sql_src_msg_trgt)
 
 
 

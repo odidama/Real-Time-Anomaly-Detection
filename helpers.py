@@ -1,5 +1,4 @@
-from sqlalchemy import create_engine, Column, insert, Integer, Table, String, MetaData, DECIMAL, VARCHAR, TIMESTAMP, DOUBLE
-from sqlalchemy.orm import sessionmaker, declarative_base
+from sqlalchemy import create_engine
 import requests
 import random
 import uuid
@@ -9,6 +8,7 @@ import pandas as pd
 from datetime import datetime
 import pickle
 import redis
+from redis.client import Redis, ConnectionPool
 import streamlit as st
 import re
 from sentence_transformers import  SentenceTransformer

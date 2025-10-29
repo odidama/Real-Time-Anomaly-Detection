@@ -2,11 +2,12 @@ import os
 import redis
 from time import sleep
 from dotenv import load_dotenv
-from helpers import generate_server_logs
+from helpers import generate_server_logs, connect_redis_cloud
 
 load_dotenv()
 
-redis_server = redis.Redis(host=os.getenv('redis_host'), port=6379, db=0)
+# redis_server = redis.Redis(host=os.getenv('redis_host'), port=6379, db=0)
+redis_server = connect_redis_cloud()
 
 
 def stream_server_logs():

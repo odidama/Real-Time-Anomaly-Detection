@@ -247,16 +247,17 @@ def consume_from_redis_q(stream):
     message_id = []
 
     for stream_id, fields in redis_messages[0][1]:
-        entry_data = {"message_id": stream_id}
+        entry_data = {"message_id": stream_id.decode('utf-8')}
         message_id.append(stream_id)
         for key, value in fields.items():
-            entry_data[key] = value
+            entry_data[key.decode('utf-8')] = value.decode('utf-8')
         processed_streams.append(entry_data)
 
 
     for msg_id in message_id:
         redis_server.xdel(stream_key, msg_id)
 
+    print(f"Successfully processed this batch of streams: {processed_streams}")
     return processed_streams
 
 
@@ -264,7 +265,7 @@ def consume_from_redis_q(stream):
 def convert_logs_to_dataframe(logs):
 
     df = pd.DataFrame(logs)
-    # print(read_into_df)
+    print(f" Successfully converted logs to df: \n {df}")
     return df
 
 
@@ -397,16 +398,30 @@ def run_pd_sql(stmnt):
 
 
 def get_news_article():
-    topics = ['ai', 'cyber security']
-    news_url = f"https://newsapi.org/v2/everything?q={random.choice(topics)}&apiKey={st.secrets['NEWS_API_KEY']}&pageSize=1"
-    result = requests.get(news_url)
+    topics = ['cyber security']
+    api_key = st.secrets['w_news_api']
+    date_ = datetime.now().strftime("%Y-%m-%d")
+    # news_url = f"https://newsapi.org/v2/everything?q={random.choice(topics)}&apiKey={st.secrets['NEWS_API_KEY']}&pageSize=1"
+    w_news_url = f"https://api.worldnewsapi.com/search-news?text={random.choice(topics)}&language=en&earliest-publish-date={date_}"
+
+    headers = {
+        'x-api-key': api_key
+    }
+
+    result = requests.get(w_news_url, headers=headers)
     news_result = result.json()
-    # print(type(news_result))
-    for i in news_result["articles"]:
-        news_source = i["source"]["name"]
-        news_author = i["author"]
-        news_title = i["title"]
-        news_description = i["description"]
-        news_url = i["url"]
-        # print(i)
-    return news_source, news_author, news_title, news_description, news_url
+    all_news = []
+    for i in news_result['news']:
+        ind_news = {
+            "id": i["id"],
+            "news_author": i["author"],
+            "news_title": i["title"],
+            "news_url": i["url"]
+        }
+        all_news.append(ind_news)
+
+    news_df = pd.DataFrame(all_news)
+    news_df['timestamp'] = datetime.now().strftime("%Y-%m-%d")
+    news_df.to_sql(name='news', con=conn, if_exists='append', index=False)
+
+    return news_df

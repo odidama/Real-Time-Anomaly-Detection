@@ -191,11 +191,16 @@ messages = {
 def connect_to_db():
 
     try:
-        host = '127.0.0.1'
-        port = 3306
-        user = os.getenv('MYSQL_USER')
-        password = os.getenv('MYSQL_PASSWORD')
-        database = os.getenv('MYSQL_DATABASE')
+        # host = '127.0.0.1'
+        host = st.secrets["f_host"]
+        # port = 3306
+        port = st.secrets["f_port"]
+        # user = os.getenv('MYSQL_USER')
+        user = st.secrets["f_user"]
+        # password = os.getenv('MYSQL_PASSWORD')
+        password = st.secrets["f_password"]
+        # database = os.getenv('MYSQL_DATABASE')
+        database = st.secrets["f_db"]
         db_url = f"mysql+pymysql://{user}:{password}@{host}:{port}/{database}"
         engine = create_engine(db_url, echo=False)
         return engine

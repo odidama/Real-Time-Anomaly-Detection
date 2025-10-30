@@ -44,7 +44,7 @@ def perform_log_column_clustering(logs_df):
 
     # logs, eps = 0.5, min_sample = 5, metric = 'cosine'
     cluster = perform_clustering(logs_df, eps=0.5, min_sample=5, metric='cosine')
-    # print("df Clustering done...")
+    print("df Clustering done...")
 
     return cluster
 
@@ -57,21 +57,21 @@ def perform_log_column_clustering(logs_df):
 def regex_classify_logs_dataframe(read_into_df):
     # run the regex classify fxn on the dataframe and write to db
     read_into_df['regex_label'] = read_into_df['log_message'].apply(classify_pd_with_regex)
-    # print(f"regex_classify done \n {read_into_df}")
+    print(f"regex_classify done \n {read_into_df}")
 
     # make a copy of only regex classified records - without null
     df_regex_classified = read_into_df[read_into_df['regex_label'].notnull()].copy()
-    # print(f"made copy of df")
+    print(f"made copy of df")
 
     # add a timestamp and write the regex classified records output to db
     df_regex_classified['workflow_timestamp'] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    # print(f" \n Data to load \n{df_regex_classified}")
+    print(f" \n Data to load \n{df_regex_classified}")
     df_regex_classified.to_sql(name='regex_classified', con=conn, if_exists='append', index=False)
-    # print(f"Data loaded into regex_classified table")
+    print(f"Data loaded into regex_classified table")
 
     # create another df with unclassified messages to be used for the linear regression fxn
     df_no_regex = read_into_df[read_into_df['regex_label'].isnull()].copy()
-    # print(f"df without regex: \n {df_no_regex}")
+    print(f"df without regex: \n {df_no_regex}")
 
     return df_no_regex
 

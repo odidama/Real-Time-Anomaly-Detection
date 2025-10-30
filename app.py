@@ -16,12 +16,21 @@ st.markdown("""
 }
 </style>
 """, unsafe_allow_html=True)
-
+st.markdown(
+    """
+    <style>
+    section[data-testid="stSidebar"] {
+        width: 400px !important;  # Set the desired width in pixels
+    }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
 # SQL Statements
 # date_today = '2025-10-25'
 date_today = datetime.now().strftime("%Y-%m-%d")
 
-# st_autorefresh(interval=3600000, key="data_refresh")
+st_autorefresh(interval=3600000, key="data_refresh")
 
 # news_source, news_author, news_title, news_description, news_url = helpers.get_news_article()
 

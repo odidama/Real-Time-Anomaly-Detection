@@ -209,7 +209,7 @@ def connect_to_db():
     return None
 
 
-conn = connect_to_db()
+conn = connect_to_db().connect()
 
 def generate_server_logs():
     target = random.choice([target for target in messages])

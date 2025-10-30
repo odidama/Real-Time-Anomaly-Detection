@@ -16,7 +16,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-conn = connect_to_db()
+conn = connect_to_db().connect()
 
 # pd.set_option('display.max_columns', None)
 pd.set_option('display.max_rows', 1000)
@@ -44,6 +44,7 @@ def perform_log_column_clustering(logs_df):
 
     # logs, eps = 0.5, min_sample = 5, metric = 'cosine'
     cluster = perform_clustering(logs_df, eps=0.5, min_sample=5, metric='cosine')
+    # print("df Clustering done...")
 
     return cluster
 
@@ -56,16 +57,21 @@ def perform_log_column_clustering(logs_df):
 def regex_classify_logs_dataframe(read_into_df):
     # run the regex classify fxn on the dataframe and write to db
     read_into_df['regex_label'] = read_into_df['log_message'].apply(classify_pd_with_regex)
+    # print(f"regex_classify done \n {read_into_df}")
 
     # make a copy of only regex classified records - without null
     df_regex_classified = read_into_df[read_into_df['regex_label'].notnull()].copy()
+    # print(f"made copy of df")
 
     # add a timestamp and write the regex classified records output to db
     df_regex_classified['workflow_timestamp'] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    # print(f" \n Data to load \n{df_regex_classified}")
     df_regex_classified.to_sql(name='regex_classified', con=conn, if_exists='append', index=False)
+    # print(f"Data loaded into regex_classified table")
 
     # create another df with unclassified messages to be used for the linear regression fxn
     df_no_regex = read_into_df[read_into_df['regex_label'].isnull()].copy()
+    # print(f"df without regex: \n {df_no_regex}")
 
     return df_no_regex
 
@@ -86,7 +92,8 @@ def bert_classify_unclassified_logs(df_no_regex):
 
     # add a timestamp and write the df to a pg table
     df_no_regex['workflow_timestamp'] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    df_no_regex.to_sql(name='bert_classified', con=connect_to_db(), if_exists='append', index=False)
+    df_no_regex.to_sql(name='bert_classified', con=conn, if_exists='append', index=False)
+    conn.close()
 
     return df_no_regex_no_bert
 

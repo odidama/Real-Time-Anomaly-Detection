@@ -33,8 +33,8 @@ sql_all_events_today = f"select count(1) from regex_classified rc where CAST(rc.
 
 sql_count_grp_per_event_type = (f"with union_select as (select * from regex_classified rc union all "
              f"select * from bert_classified bc) select regex_label, count(1) as number_of_events "
-             f"from union_select us group by regex_label, TO_DATE(us.workflow_timestamp, 'YYYY-MM-DD') "
-             f"having TO_DATE(us.workflow_timestamp, 'YYYY-MM-DD') = '{date_today}' ")
+             f"from union_select us group by regex_label, workflow_timestamp "
+             f"having CAST(workflow_timestamp as DATE) = '{date_today}' ")
 
 
 sql_security_alert = (f"select count(1) from regex_classified rc where CAST(rc.workflow_timestamp as DATE) = '{date_today}'"
@@ -43,28 +43,28 @@ sql_security_alert = (f"select count(1) from regex_classified rc where CAST(rc.w
 sql_suspicious_user_actions = (f" with union_select as (select * from regex_classified rc union all "
                                f"select * from bert_classified bc) select count(1) as UserActions "
                                f"from union_select us where regex_label = 'User Action' "
-                               f"and TO_DATE(us.workflow_timestamp, 'YYYY-MM-DD') = '{date_today}'")
+                               f"and CAST(workflow_timestamp as DATE) = '{date_today}'")
 
 sql_source_system = (f"with union_select as (select * from regex_classified rc union all "
-                     f"select * from bert_classified bc) SELECT distinct(us.source), count(1) "
-                     f"from union_select us group by distinct(us.source), TO_DATE(us.workflow_timestamp, 'YYYY-MM-DD') "
-                     f"having TO_DATE(us.workflow_timestamp, 'YYYY-MM-DD') = '{date_today}'")
+                     f"select * from bert_classified bc) SELECT distinct(source), count(1) as count "
+                     f"from union_select us group by source, workflow_timestamp "
+                     f"having CAST(workflow_timestamp as DATE) = '{date_today}'")
 
 sql_src_msg_trgt = (f"with union_select as (select * from regex_classified rc union all "
                     f"select * from bert_classified bc) SELECT us.source  Source_System, "
                     f"target_label Action, log_message Log_Message,"
-                    f"us.workflow_timestamp as Event_Timestamp from "
-                    f"union_select us where TO_DATE(us.workflow_timestamp, 'YYYY-MM-DD') = '{date_today}' "
-                    f"order by TO_DATE(us.workflow_timestamp, 'YYYY-MM-DD') desc limit 9")
+                    f"workflow_timestamp as Event_Timestamp from "
+                    f"union_select us where CAST(workflow_timestamp as DATE) = '{date_today}' "
+                    f"order by CAST(workflow_timestamp as DATE) desc limit 9")
 
 sql_latest_news = (f"select news_author, news_title, news_url  from news "
-                   f"where TO_DATE(timestamp, 'YYYY-MM-DD') = '2025-10-28' order by random() limit 1")
+                   f"where CAST(timestamp as DATE) = '{date_today}' order by rand() limit 1")
 
 sql_security_events_cnt_hist = (f"with union_select as (select * from regex_classified rc  union all "
-                                f"select * from bert_classified bc) SELECT TO_DATE(us.workflow_timestamp, 'YYYY-MM-DD'),"
-                                f" count(1) from union_select us group by TO_DATE(us.workflow_timestamp, 'YYYY-MM-DD'), "
+                                f"select * from bert_classified bc) SELECT CAST(workflow_timestamp as DATE),"
+                                f" count(1) from union_select us group by CAST(workflow_timestamp as DATE)), "
                                 f"us.target_label having us.target_label = 'Security Alert' "
-                                f"and TO_DATE(us.workflow_timestamp, 'YYYY-MM-DD') is not null")
+                                f"and CAST(us.workflow_timestamp as DATE) is not null")
 
 critical_events_count_today = helpers.run_pd_sql(sql_all_critical_events_cnt_today).iloc[0, 0].item()
 all_events_today = helpers.run_pd_sql(sql_all_events_today).iloc[0, 0].item()

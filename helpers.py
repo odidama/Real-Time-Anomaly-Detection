@@ -3,6 +3,7 @@ import requests
 import random
 import uuid
 import os
+import mysql.connector
 from groq import Groq
 import pandas as pd
 from datetime import datetime
@@ -22,7 +23,7 @@ load_dotenv()
 
 model = SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')
 
-engine = None
+# engine = None
 
 groq = Groq()
 
@@ -165,27 +166,43 @@ messages = {
         }
 
 
+# def connect_to_db():
+#
+#     global engine
+#     if engine is None:
+#
+#         # DB_USER = os.getenv("db_user")
+#         DB_USER = st.secrets["db_user"]
+#         # DB_PASSWORD = os.getenv("db_password")
+#         DB_PASSWORD = st.secrets["db_password"]
+#         # DB_HOST = os.getenv("db_host")
+#         DB_HOST = st.secrets["db_host"]
+#         # DB_PORT = os.getenv("db_port")
+#         DB_PORT = st.secrets["db_port"]
+#         # DB_NAME = os.getenv("db_name")
+#         DB_NAME = st.secrets["db_name"]
+#
+#         pgdb_url = f"postgresql+psycopg2://{DB_USER}:{DB_PASSWORD}@{DB_HOST}/{DB_NAME}"
+#
+#         engine = create_engine(pgdb_url)
+#     return engine
+#     # return None
+
 def connect_to_db():
 
-    global engine
-    if engine is None:
+    try:
+        host = '127.0.0.1'
+        port = 3306
+        user = os.getenv('MYSQL_USER')
+        password = os.getenv('MYSQL_PASSWORD')
+        database = os.getenv('MYSQL_DATABASE')
+        db_url = f"mysql+pymysql://{user}:{password}@{host}:{port}/{database}"
+        engine = create_engine(db_url, echo=False)
+        return engine
+    except mysql.connector.Error as err:
+        print(f"Error connecting to MySQL: {err}")
+    return None
 
-        # DB_USER = os.getenv("db_user")
-        DB_USER = st.secrets["db_user"]
-        # DB_PASSWORD = os.getenv("db_password")
-        DB_PASSWORD = st.secrets["db_password"]
-        # DB_HOST = os.getenv("db_host")
-        DB_HOST = st.secrets["db_host"]
-        # DB_PORT = os.getenv("db_port")
-        DB_PORT = st.secrets["db_port"]
-        # DB_NAME = os.getenv("db_name")
-        DB_NAME = st.secrets["db_name"]
-
-        pgdb_url = f"postgresql+psycopg2://{DB_USER}:{DB_PASSWORD}@{DB_HOST}/{DB_NAME}"
-
-        engine = create_engine(pgdb_url)
-    return engine
-    # return None
 
 conn = connect_to_db()
 
@@ -257,7 +274,7 @@ def consume_from_redis_q(stream):
     for msg_id in message_id:
         redis_server.xdel(stream_key, msg_id)
 
-    print(f"Successfully processed this batch of streams: {processed_streams}")
+    print(f"Successfully processed this batch of streams: {processed_streams}\n")
     return processed_streams
 
 

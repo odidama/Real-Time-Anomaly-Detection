@@ -34,9 +34,13 @@ st_autorefresh(interval=3600000, key="data_refresh")
 
 # news_source, news_author, news_title, news_description, news_url = helpers.get_news_article()
 
-sql_all_critical_events_cnt_today = (f"select count(1) from regex_classified rc "
-                                 f"where CAST(rc.workflow_timestamp as DATE) = '{date_today}' "
-                                 f"and regex_label in ('Workflow Error', 'Security Alert', 'Critical Error')")
+sql_all_critical_events_cnt_today = (f"with union_select as (select * from regex_classified rc union all select * from bert_classified bc) "
+                                     f"SELECT count(1) as count from union_select us where "
+                                     f"regex_label in ('Workflow Error', 'Security Alert', 'Critical Error') and CAST(workflow_timestamp as DATE) = '{date_today}'")
+
+# sql_all_critical_events_cnt_today = (f"select count(1) from regex_classified rc "
+#                                  f"where CAST(rc.workflow_timestamp as DATE) = '{date_today}' "
+#                                  f"and regex_label in ('Workflow Error', 'Security Alert', 'Critical Error')")
 
 sql_all_events_today = f"select count(1) from regex_classified rc where CAST(rc.workflow_timestamp as DATE) = '{date_today}'"
 
@@ -103,7 +107,12 @@ st.sidebar.markdown(f":small[Created by] nnaemeka.okeke@gmail.com")
 # [0.28,0.4,0.3]
 col1, col2, col3 = st.columns(3)
 col1.metric(label=f":green[{datetime.now().strftime('%a. %b %d, %Y')}] - **All Events Count :** ", value=f"{all_events_today}", border=True)
-col2.metric(label=f"**Critical | Suspicious Events:** ", value=f"{critical_events_count_today} | {sql_suspicious_user_actions}", border=True)
+
+if critical_events_count_today  == 0 or sql_suspicious_user_actions == 0:
+    col2.metric(label=f"**Critical | Suspicious Events:** ", value=f"{0} | {0}", border=True)
+else:
+    col2.metric(label=f"**Critical | Suspicious Events:** ", value=f"{critical_events_count_today} | {sql_suspicious_user_actions}", border=True)
+
 with col3:
     # st.metric(label=f"News** ", value=f"{latest_news['news_title'].item()}", border=True)
     with st.container(border=True, height=210):

@@ -9,23 +9,14 @@ import helpers
 st.markdown("""
 <style>
 .block-container {
-    padding-top: 4rem; /* Adjust this value as needed, 0rem will remove all padding */
+    padding-top: rem; /* Adjust this value as needed, 0rem will remove all padding */
     padding-bottom: 0rem;
     padding-left: 2rem;
     padding-right: 2rem;
 }
 </style>
 """, unsafe_allow_html=True)
-st.markdown(
-    """
-    <style>
-    section[data-testid="stSidebar"] {
-        width: 400px !important;  # Set the desired width in pixels
-    }
-    </style>
-    """,
-    unsafe_allow_html=True,
-)
+
 # SQL Statements
 # date_today = '2025-10-25'
 date_today = datetime.now().strftime("%Y-%m-%d")
@@ -114,11 +105,15 @@ else:
     col2.metric(label=f"**Critical | Suspicious Events:** ", value=f"{critical_events_count_today} | {sql_suspicious_user_actions}", border=True)
 
 with col3:
+
     # st.metric(label=f"News** ", value=f"{latest_news['news_title'].item()}", border=True)
     with st.container(border=True, height=210):
         st.markdown("CyberSec & A.I Events:")
         st.markdown(f":grey[:small[{latest_news['news_title'].item()}]]")
-        st.markdown(f":grey[:small[by {latest_news['news_author'].item()}]]")
+        if latest_news['news_author'] == "None":
+            st.markdown(f":grey[:small[ Author Unknown ]]")
+        else:
+            st.markdown(f":grey[:small[by {latest_news['news_author'].item()}]]")
         st.markdown(f":small[{latest_news['news_url'].item()}]")
 st.write("")
 col4, col5 = st.columns([0.8, 1.5])
@@ -172,3 +167,13 @@ div[data-testid="stMetric"] {
 
 </style>
 ''', unsafe_allow_html=True)
+st.markdown(
+    """
+    <style>
+    section[data-testid="stSidebar"] {
+        width: 400px !important;  # Set the desired width in pixels
+    }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)

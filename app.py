@@ -110,7 +110,7 @@ with col3:
     with st.container(border=True, height=210):
         st.markdown("CyberSec & A.I Events:")
         st.markdown(f":grey[:small[{latest_news['news_title'].item()}]]")
-        if latest_news['news_author'] == "None":
+        if latest_news['news_author'].iloc[0, 0].item() == "None":
             st.markdown(f":grey[:small[ Author Unknown ]]")
         else:
             st.markdown(f":grey[:small[by {latest_news['news_author'].item()}]]")

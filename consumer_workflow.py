@@ -1,22 +1,17 @@
-import os
-import re
-import pickle
 from time import sleep
-import redis
-from groq import Groq
-from sympy.stats.rv import probability
 from datetime import datetime
-from helpers import generate_server_logs, consume_from_redis_q, convert_logs_to_dataframe, classify_pd_with_regex, \
-    classify_with_bert, connect_to_db, perform_clustering
+from helpers import consume_from_redis_q, convert_logs_to_dataframe, classify_pd_with_regex, classify_with_bert, connect_to_pg_db, perform_clustering
 import pandas as pd
 from sentence_transformers import SentenceTransformer
-from sklearn.cluster import DBSCAN
 
 from dotenv import load_dotenv
 
 load_dotenv()
 
-conn = connect_to_db().connect()
+# logging.basicConfig(level=logging.INFO, filename=f'logs/consumer_workflow_{datetime.now().strftime('%Y%m%d-%H%M%S.%f')[:-3]}.txt',
+#                     format='%(process)d--%(asctime)s--%(levelname)s--%(message)s')
+
+conn = connect_to_pg_db()
 
 # pd.set_option('display.max_columns', None)
 pd.set_option('display.max_rows', 1000)
@@ -114,4 +109,9 @@ def consumer_workflow():
 
 
 if __name__ == "__main__":
-    consumer_workflow()
+    while True:
+        print("Processing Redis Stream logs...")
+        consumer_workflow()
+        print("Process completed, waiting 5 Minutes to restart")
+        sleep(300000)  # Seconds
+

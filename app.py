@@ -62,7 +62,7 @@ sql_src_msg_trgt = (f"with union_select as (select * from regex_classified rc un
                     f"order by CAST(workflow_timestamp as DATE) desc limit 9")
 
 sql_latest_news = (f"select news_author, news_title, news_url  from news "
-                   f"where CAST(timestamp as DATE) = '{date_today}' order by rand() limit 1")
+                   f"where CAST(timestamp as DATE) = '{date_today}' order by random() limit 1")
 
 sql_security_events_cnt_hist = (f"with union_select as (select * from regex_classified rc  union all "
                                 f"select * from bert_classified bc) SELECT CAST(workflow_timestamp as DATE),"

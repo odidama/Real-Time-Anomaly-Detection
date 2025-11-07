@@ -2,6 +2,7 @@ from sqlalchemy import create_engine
 import requests
 import random
 import uuid
+import logging
 import os
 import mysql.connector
 from groq import Groq
@@ -26,6 +27,9 @@ model = SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')
 # engine = None
 
 groq = Groq()
+
+# logging.basicConfig(level=logging.INFO, filename=f'logs/consumer_workflow_{datetime.now().strftime('%Y%m%d-%H%M%S.%f')[:-3]}.txt',
+#                     format='%(process)d--%(asctime)s--%(levelname)s--%(message)s')
 
 user_agents = ['Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36',
                'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:54.0) Gecko/20100101 Firefox/54.0',
@@ -165,51 +169,58 @@ messages = {
             ]
         }
 
+#
+# def connect_to_db_local():
+#
+#     try:
+#         host = '127.0.0.1'
+#         port = 3306
+#         user = os.getenv('MYSQL_USER')
+#         password = os.getenv('MYSQL_PASSWORD')
+#         database = os.getenv('MYSQL_DATABASE')
+#         db_url = f"mysql+pymysql://{user}:{password}@{host}:{port}/{database}"
+#         engine = create_engine(db_url, echo=False)
+#         return engine
+#     except mysql.connector.Error as err:
+#         print(f"Error connecting to MySQL: {err}")
+#     return None
+#
+#
+# def connect_to_mysql_db():
+#
+#     try:
+#         # host = '127.0.0.1'
+#         host = st.secrets["f_host"]
+#         # port = 3306
+#         port = st.secrets["f_port"]
+#         # user = os.getenv('MYSQL_USER')
+#         user = st.secrets["f_user"]
+#         # password = os.getenv('MYSQL_PASSWORD')
+#         password = st.secrets["f_password"]
+#         # database = os.getenv('MYSQL_DATABASE')
+#         database = st.secrets["f_db"]
+#         db_url = f"mysql+pymysql://{user}:{password}@{host}:{port}/{database}"
+#         engine = create_engine(db_url, echo=False)
+#         return engine
+#     except mysql.connector.Error as err:
+#         print(f"Error connecting to MySQL: {err}")
+#     return None
 
-# def connect_to_db():
-#
-#     global engine
-#     if engine is None:
-#
-#         # DB_USER = os.getenv("db_user")
-#         DB_USER = st.secrets["db_user"]
-#         # DB_PASSWORD = os.getenv("db_password")
-#         DB_PASSWORD = st.secrets["db_password"]
-#         # DB_HOST = os.getenv("db_host")
-#         DB_HOST = st.secrets["db_host"]
-#         # DB_PORT = os.getenv("db_port")
-#         DB_PORT = st.secrets["db_port"]
-#         # DB_NAME = os.getenv("db_name")
-#         DB_NAME = st.secrets["db_name"]
-#
-#         pgdb_url = f"postgresql+psycopg2://{DB_USER}:{DB_PASSWORD}@{DB_HOST}/{DB_NAME}"
-#
-#         engine = create_engine(pgdb_url)
-#     return engine
-#     # return None
-
-def connect_to_db():
-
+def connect_to_pg_db():
     try:
-        # host = '127.0.0.1'
-        host = st.secrets["f_host"]
-        # port = 3306
-        port = st.secrets["f_port"]
-        # user = os.getenv('MYSQL_USER')
-        user = st.secrets["f_user"]
-        # password = os.getenv('MYSQL_PASSWORD')
-        password = st.secrets["f_password"]
-        # database = os.getenv('MYSQL_DATABASE')
-        database = st.secrets["f_db"]
-        db_url = f"mysql+pymysql://{user}:{password}@{host}:{port}/{database}"
-        engine = create_engine(db_url, echo=False)
-        return engine
-    except mysql.connector.Error as err:
-        print(f"Error connecting to MySQL: {err}")
-    return None
+        DB_USER = st.secrets["vlt_USER"]
+        DB_PASSWORD = st.secrets["vlt_PASSWORD"]
+        DB_HOST = st.secrets["vlt_HOST"]
+        DB_PORT = st.secrets["vlt_PORT"]
+        DB_NAME = st.secrets["vlt_DBNAME"]
+        pgdb_url = f"postgresql+psycopg2://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:5432/{DB_NAME}"
+        engine = create_engine(pgdb_url)
+        return engine.connect()
+    except Exception as e:
+        print(f"Error connecting to DB: {e}")
+        return None
 
-
-conn = connect_to_db().connect()
+conn = connect_to_pg_db()
 
 def generate_server_logs():
     target = random.choice([target for target in messages])
@@ -414,9 +425,14 @@ def classify_log_msg_with_llm(log_message):
 
 
 def run_pd_sql(stmnt):
-    output = pd.read_sql(stmnt, con=conn)
+    try:
+        output = pd.read_sql(stmnt, con=conn)
+        return output
+    except Exception as e:
+        print(f"DB Error: {e}")
+        conn.rollback()
+    return None
 
-    return output
 
 
 def get_news_article():
@@ -445,5 +461,6 @@ def get_news_article():
     news_df = pd.DataFrame(all_news)
     news_df['timestamp'] = datetime.now().strftime("%Y-%m-%d")
     news_df.to_sql(name='news', con=conn, if_exists='append', index=False)
+    conn.close()
 
     return news_df

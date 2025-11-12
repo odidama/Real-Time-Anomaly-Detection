@@ -8,7 +8,7 @@ import helpers
 st.markdown("""
 <style>
 .block-container {
-    padding-top: 0rem; /* Adjust this value as needed, 0rem will remove all padding */
+    padding-top: 1rem; /* Adjust this value as needed, 0rem will remove all padding */
     padding-bottom: 0rem;
     padding-left: 2rem;
     padding-right: 2rem;

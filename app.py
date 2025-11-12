@@ -1,6 +1,5 @@
 import streamlit as st
 from datetime import datetime
-from streamlit_extras.stylable_container import stylable_container
 from streamlit_autorefresh import st_autorefresh
 import plotly.express as px
 import plotly.graph_objects as go
@@ -9,7 +8,7 @@ import helpers
 st.markdown("""
 <style>
 .block-container {
-    padding-top: rem; /* Adjust this value as needed, 0rem will remove all padding */
+    padding-top: 0rem; /* Adjust this value as needed, 0rem will remove all padding */
     padding-bottom: 0rem;
     padding-left: 2rem;
     padding-right: 2rem;
@@ -62,7 +61,7 @@ sql_src_msg_trgt = (f"with union_select as (select * from regex_classified rc un
                     f"order by CAST(workflow_timestamp as DATE) desc limit 9")
 
 sql_latest_news = (f"select news_author, news_title, news_url  from news "
-                   f"where CAST(timestamp as DATE) = '{date_today}' order by random() limit 1")
+                   f"order by random() limit 1")
 
 sql_security_events_cnt_hist = (f"with union_select as (select * from regex_classified rc  union all "
                                 f"select * from bert_classified bc) SELECT CAST(workflow_timestamp as DATE),"
@@ -126,10 +125,11 @@ with col4:
 
 with col5:
     with st.container(height=280, border=False, vertical_alignment='center'):
-        custom_colors = ['#2e5cb8', '#24478f', '#29293d', '#002b80', '#00134d', '#264d73']
+        # custom_colors = ['#2e5cb8', '#003399', '#29293d', '#002b80', '#00134d', '#264d73']
+        colors = ['lightslategray', 'crimson', 'lightslategray', 'lightslategray', 'lightslategray', '#29293d']
         # bar_trace = go.Bar(x=source_systems['source'], y=source_systems['count'])
         # fig5 = go.Figure(data=[bar_trace])
-        fig5 = go.Figure(go.Bar(x=source_systems['source'], y=source_systems['count'], marker_color=custom_colors))
+        fig5 = go.Figure(go.Bar(x=source_systems['source'], y=source_systems['count']))
         fig5.update_layout(height=320, showlegend=False, title_text='Source Systems')
         fig5.update_traces(width=0.4)
         st.plotly_chart(fig5, use_container_width=True)

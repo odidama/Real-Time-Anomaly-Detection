@@ -83,8 +83,8 @@ st.set_page_config(page_title="AI/ML-Powered SIEM platform", layout="wide", init
 st.sidebar.header(f"Real-Time Log Analytics & Anomaly Detection Pipeline")
 st.sidebar.markdown(f":green[**Tech Stack:** Python, Pandas, Redis Streams, Scikit-learn, BERT, Logistic Regression, Regex]")
 st.sidebar.markdown(f":small[A near-real-time log analytics and anomaly detection platform to help organizations "
-                    f"proactively identify issues in their distributed systems.Using Python, Redis Streams, "
-                    f"the solution processed and analyzed continuous log data with high throughput and automation.]")
+                    f"proactively identify issues in their distributed systems. Using a Python script to generate and stream (demo) log data to Redis, "
+                    f"the solution continuously processed and analyzed the data with high throughput and automation.]")
 st.sidebar.markdown(f":small[A Regex-based classifier reduced data noise, while DBSCAN clustering and BERT + "
                     f"Logistic Regression models detected anomalies and unknown patterns — improving precision by 30%.]")
 st.sidebar.markdown(":small[The modular, scalable design supports automated retraining, trend visualization, "
@@ -93,6 +93,9 @@ st.sidebar.markdown(f":small[This project demonstrated expertise in Python data 
                     f"and reliable workflow automation — skills directly applicable to operational analytics, "
                     f"fraud detection, and intelligent monitoring systems.]")
 st.sidebar.markdown(f":small[Created by] nnaemeka.okeke@gmail.com")
+with st.sidebar:
+    url = "https://github.com/odidama/Real-Time-Anomaly-Detection"
+    st.write("[source code](%s)" % url)
 
 # [0.28,0.4,0.3]
 col1, col2, col3 = st.columns(3)

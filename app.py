@@ -49,8 +49,8 @@ sql_suspicious_user_actions = (f" with union_select as (select * from regex_clas
                                f"and CAST(workflow_timestamp as DATE) = '{date_today}'")
 
 sql_source_system = (f"with union_select as (select * from regex_classified rc union all "
-                     f"select * from bert_classified bc) SELECT distinct(source), count(1) as count "
-                     f"from union_select us group by source, workflow_timestamp "
+                     f"select * from bert_classified bc) SELECT source, count(source) as count "
+                     f"from union_select us group by source, CAST(workflow_timestamp as DATE) "
                      f"having CAST(workflow_timestamp as DATE) = '{date_today}'")
 
 sql_src_msg_trgt = (f"with union_select as (select * from regex_classified rc union all "
@@ -128,11 +128,12 @@ with col4:
 
 with col5:
     with st.container(height=280, border=False, vertical_alignment='center'):
-        # custom_colors = ['#2e5cb8', '#003399', '#29293d', '#002b80', '#00134d', '#264d73']
-        colors = ['lightslategray', 'crimson', 'lightslategray', 'lightslategray', 'lightslategray', '#29293d']
+        colors = ['#2e5cb8', '#003399', '#29293d', '#002b80', '#00134d', '#264d73']
+        # colors = ['red', 'green', 'blue', 'orange', 'purple']
         # bar_trace = go.Bar(x=source_systems['source'], y=source_systems['count'])
         # fig5 = go.Figure(data=[bar_trace])
-        fig5 = go.Figure(go.Bar(x=source_systems['source'], y=source_systems['count']))
+        # fig5 = go.Figure(go.Bar(x=source_systems['source'], y=source_systems['count'], marker=dict(color=colors)))
+        fig5 = go.Figure(data=[go.Bar(x=source_systems['source'], y=source_systems['count'], marker_color=colors)])
         fig5.update_layout(height=320, showlegend=False, title_text='Source Systems')
         fig5.update_traces(width=0.4)
         st.plotly_chart(fig5, use_container_width=True)

@@ -4,13 +4,11 @@ import random
 import uuid
 import logging
 import os
-import mysql.connector
 from groq import Groq
 import pandas as pd
 from datetime import datetime
 import pickle
 import redis
-from redis.client import Redis, ConnectionPool
 import streamlit as st
 import re
 from sentence_transformers import  SentenceTransformer
@@ -51,11 +49,11 @@ refurl = random.choice(['https://www.example.com/','https://www.google.com/','ht
 user_agent = random.choice(user_agents)
 
 timestamp_a = datetime.now().strftime("%Y-%m-%d %H:%M:%S,%f")[:-3]
-timestamp_b = datetime.now().strftime("%Y/%m/%d %H:%M:%S,%f")
-timestamp_c = datetime.now().strftime("%d/%M/%Y %H:%M:%S,%f")
-timestamp_d = datetime.now().strftime("%Y-%m-%d")
+timestamp_b = datetime.now().strftime("%Y-%m-%d %H:%M:%S,%f")
+# timestamp_c = datetime.now().strftime("%d/%m/%Y %H:%M:%S,%f")
+# timestamp_d = datetime.now().strftime("%Y-%m-%d")
 
-time_formats = [timestamp_a, timestamp_b, timestamp_c]
+time_formats = [timestamp_a, timestamp_b]
 
 time_len = round(random.uniform(0, 2), 6)
 small_float = round(random.uniform(0, 2), 2)
@@ -290,7 +288,7 @@ def consume_from_redis_q(stream):
     for msg_id in message_id:
         redis_server.xdel(stream_key, msg_id)
 
-    print(f"Successfully processed this batch of streams: {processed_streams}\n")
+    print(f"Successfully processed this batch of streams")
     return processed_streams
 
 
@@ -298,7 +296,7 @@ def consume_from_redis_q(stream):
 def convert_logs_to_dataframe(logs):
 
     df = pd.DataFrame(logs)
-    print(f" Successfully converted logs to df: \n {df}")
+    print(f"Successfully converted logs to df")
     return df
 
 
@@ -436,9 +434,10 @@ def run_pd_sql(stmnt):
 
 
 def get_news_article():
-    topics = ['cyber security']
+    topics = ['cyber+security']
     api_key = st.secrets['w_news_api']
-    date_ = datetime.now().strftime("%Y-%m-%d")
+    # date_ = datetime.now().strftime("%Y-%m-%d")
+    date_ = '2025-11-22'
     # news_url = f"https://newsapi.org/v2/everything?q={random.choice(topics)}&apiKey={st.secrets['NEWS_API_KEY']}&pageSize=1"
     w_news_url = f"https://api.worldnewsapi.com/search-news?text={random.choice(topics)}&language=en&earliest-publish-date={date_}"
 

@@ -51,7 +51,7 @@ user_agent = random.choice(user_agents)
 timestamp_a = datetime.now().strftime("%Y-%m-%d %H:%M:%S,%f")[:-3]
 timestamp_b = datetime.now().strftime("%Y-%m-%d %H:%M:%S,%f")
 # timestamp_c = datetime.now().strftime("%d/%m/%Y %H:%M:%S,%f")
-# timestamp_d = datetime.now().strftime("%Y-%m-%d")
+timestamp_d = datetime.now().strftime("%Y%m%d")
 
 time_formats = [timestamp_a, timestamp_b]
 

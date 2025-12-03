@@ -32,7 +32,11 @@ sql_all_critical_events_cnt_today = (f"with union_select as (select * from regex
 #                                  f"where CAST(rc.workflow_timestamp as DATE) = '{date_today}' "
 #                                  f"and regex_label in ('Workflow Error', 'Security Alert', 'Critical Error')")
 
-sql_all_events_today = f"select count(1) from regex_classified rc where CAST(rc.workflow_timestamp as DATE) = '{date_today}'"
+# sql_all_events_today = f"select count(1) from regex_classified rc where CAST(rc.workflow_timestamp as DATE) = '{date_today}'"
+
+
+sql_all_events_today = (f"with union_select as (select * from regex_classified rc union all select * from bert_classified bc) "
+                        f"SELECT count(source) as count from union_select us where CAST(workflow_timestamp as DATE) = '{date_today}'")
 
 sql_count_grp_per_event_type = (f"with union_select as (select * from regex_classified rc union all "
              f"select * from bert_classified bc) select regex_label, count(1) as number_of_events "

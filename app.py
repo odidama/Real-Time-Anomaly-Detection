@@ -88,7 +88,7 @@ st.sidebar.header(f"Real-Time Log Analytics & Anomaly Detection Pipeline")
 st.sidebar.markdown(f":green[**Tech Stack:** Python, Pandas, Redis Streams, Scikit-learn, BERT, Logistic Regression, Regex]")
 st.sidebar.markdown(f":small[A near-real-time log analytics and anomaly detection platform to help organizations "
                     f"proactively identify issues in their distributed systems. Using a Python script to generate and stream (demo) log data to Redis, "
-                    f"the solution continuously processed and analyzed the data with high throughput and automation.]")
+                    f"the solution continuously processes and analyzes the data with high throughput and automation.]")
 st.sidebar.markdown(f":small[A Regex-based classifier reduced data noise, while DBSCAN clustering and BERT + "
                     f"Logistic Regression models detected anomalies and unknown patterns — improving precision by 30%.]")
 st.sidebar.markdown(":small[The modular, scalable design supports automated retraining, trend visualization, "

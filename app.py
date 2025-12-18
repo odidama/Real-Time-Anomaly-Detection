@@ -99,7 +99,9 @@ st.sidebar.markdown(f":small[This project demonstrated expertise in Python data 
 st.sidebar.markdown(f":small[Created by] nnaemeka.okeke@gmail.com")
 with st.sidebar:
     url = "https://github.com/odidama/Real-Time-Anomaly-Detection"
+    portfolio = "https://benjamin-okeke-portfolio.streamlit.app"
     st.write("[source code](%s)" % url)
+    st.write("[portfolio](%s)" % portfolio)
 
 # [0.28,0.4,0.3]
 col1, col2, col3 = st.columns(3)

@@ -93,9 +93,9 @@ st.sidebar.markdown(f":small[A Regex-based classifier reduced data noise, while 
                     f"Logistic Regression models detected anomalies and unknown patterns — improving precision by 30%.]")
 st.sidebar.markdown(":small[The modular, scalable design supports automated retraining, trend visualization, "
                     "and alerting, enabling faster incident response and reducing downtime risks.]")
-st.sidebar.markdown(f":small[This project demonstrated expertise in Python data engineering, AI model integration, "
+st.sidebar.markdown(f":small[This project demonstrates expertise in Python data engineering, ML model integration, "
                     f"and reliable workflow automation — skills directly applicable to operational analytics, "
-                    f"fraud detection, and intelligent monitoring systems.]")
+                    f"fraud detection, intelligent monitoring systems among other fields.]")
 st.sidebar.markdown(f":small[Created by] nnaemeka.okeke@gmail.com")
 with st.sidebar:
     url = "https://github.com/odidama/Real-Time-Anomaly-Detection"
